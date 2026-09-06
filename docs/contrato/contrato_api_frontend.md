@@ -296,6 +296,19 @@ Todas las retenciones creadas en una misma petición comparten `expires_at`.
 }
 ```
 
+- `409` (`USER_HOLD_LIMIT_REACHED`): el usuario ya posee cuatro o más butacas
+  ocupantes (`ACTIVE` o `CONFIRMED`) para este evento, o la solicitud actual
+  supera dicho cupo.
+
+```json
+{
+  "detail": {
+    "code": "USER_HOLD_LIMIT_REACHED",
+    "message": "El usuario no puede tener más de 4 butacas ocupadas para un mismo evento."
+  }
+}
+```
+
 - `422` (`INVALID_REQUEST`): el cuerpo no cumple la forma declarada.
 
 **Idempotencia.** Si una butaca del pedido ya tiene una retención vigente **del
@@ -451,6 +464,7 @@ data: {"seats":[{...},{...}]}
 | `HOLD_NOT_FOUND` | 404 | — | La retención no existe. |
 | `HOLDS_NOT_FOUND` | 404 | `hold_ids` | Alguna retención no existe o es de otro usuario. |
 | `SEATS_UNAVAILABLE` | 409 | `seat_ids` | Butacas tomadas por otro usuario. |
+| `USER_HOLD_LIMIT_REACHED` | 409 | — | El usuario alcanzó el límite máximo de 4 butacas por evento. |
 | `HOLDS_NOT_CONFIRMABLE` | 409 | `hold_ids` | Retenciones vencidas, liberadas o ya confirmadas. |
 | `HOLD_NOT_RELEASABLE` | 409 | — | La retención está confirmada. |
 | `INVALID_REQUEST` | 422 | — | El cuerpo no cumple la forma declarada. |

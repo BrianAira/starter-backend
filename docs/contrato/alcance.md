@@ -30,7 +30,6 @@ construir.
   cuando alguien vuelve a tocar esas butacas, y se deriva en cada lectura.
 - Publicación de eventos entre varias copias del backend. El canal difunde
   dentro de un solo proceso. Ver ADR-005.
-- Capacidad máxima de butacas por usuario y evento.
 
 ## Contratos aplicables
 

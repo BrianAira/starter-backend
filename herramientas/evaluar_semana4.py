@@ -146,13 +146,16 @@ def ca_006b_migracion() -> None:
             registrar("CA-006b", False, proc.stderr.strip().splitlines()[-1] if proc.stderr else "")
             return
 
-        inspector = inspect(create_engine(url))
-        reales = set(inspector.get_table_names()) - {"alembic_version"}
-        esperadas = set(Base.metadata.tables)
-        indices = {i["name"] for i in inspector.get_indexes("holds")}
-        ok = reales == esperadas and "uq_holds_event_seat_active" in indices
-        registrar("CA-006b", ok, "" if ok else f"tablas={sorted(reales)} indices={sorted(indices)}")
-
+        engine = create_engine(url)
+        try:
+            inspector = inspect(engine)
+            reales = set(inspector.get_table_names()) - {"alembic_version"}
+            esperadas = set(Base.metadata.tables)
+            indices = {i["name"] for i in inspector.get_indexes("holds")}
+            ok = reales == esperadas and "uq_holds_event_seat_active" in indices
+            registrar("CA-006b", ok, "" if ok else f"tablas={sorted(reales)} indices={sorted(indices)}")
+        finally:
+            engine.dispose()
 
 def ca_007_sin_create_all() -> None:
     texto = (RAIZ / "main.py").read_text(encoding="utf-8")

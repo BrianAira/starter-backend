@@ -131,5 +131,12 @@ operación, con otras consecuencias, y está fuera de alcance.
 ## Reglas todavía fuera de alcance
 
 - Márgenes de montaje y limpieza para una sala.
-- Capacidad máxima por usuario y evento.
 - Vencimiento en segundo plano: nadie ejecuta código cuando pasa el plazo.
+
+### `RET-007` — Límite de butacas ocupantes por usuario en un evento
+
+Un usuario no puede poseer más de cuatro (4) butacas en estado ocupante
+(`ACTIVE` o `CONFIRMED`) para un mismo evento. Si una solicitud hace que el
+total de butacas ocupantes supere este límite, la operación debe ser rechazada
+de manera atómica con una excepción de dominio, traduciéndose en una respuesta
+HTTP `409 Conflict` con el código `USER_HOLD_LIMIT_REACHED`.

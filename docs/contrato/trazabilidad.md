@@ -18,6 +18,7 @@ aunque en `reglas.md` funcione como definición asociada a `RET-001`.
 | RET-004 (persistencia) | `app/infrastructure/repository.py::marcar_vencidas` | `use_cases.crear_retenciones` | — | `tests/test_garantia_ret001.py` |
 | RET-005 | `app/core/rules.py::validar_creacion_retencion` | `use_cases.crear_retenciones` | `POST /events/{event_id}/holds` → `201` con la retención existente | `tests/test_rules.py`, `tests/test_events.py` |
 | RET-006 | `app/core/rules.py::validar_liberacion` | `use_cases.liberar_retencion` | `DELETE /holds/{hold_id}` → `204` / `409 HOLD_NOT_RELEASABLE` | `tests/aceptacion/test_ca_018_*`, `test_ca_019_*`, `test_ca_020_*` |
+| RET-007 | Validación previa en Application/Repository (ADR-007) | `use_cases.crear_retenciones` | `POST /events/{event_id}/holds` → `409 USER_HOLD_LIMIT_REACHED` | Pendiente de implementación y verificación derivada. |
 
 `RET-001` aparece dos veces a propósito: el core valida antes y la base aplica
 una restricción frente a escrituras concurrentes. Son dos protecciones de la
