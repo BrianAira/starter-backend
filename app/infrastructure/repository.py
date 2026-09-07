@@ -11,7 +11,7 @@ Ver docs/contrato/arquitectura.md y docs/adr/ADR-002.md.
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select, update
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.exc import DataError, IntegrityError, StatementError
 from sqlalchemy.orm import Session
 
@@ -150,6 +150,33 @@ class SqlAlchemyHoldRepository:
         for m in self._session.scalars(consulta.order_by(HoldModel.id)).all():
             agrupadas.setdefault(m.seat_id, []).append(_hold(m))
         return agrupadas
+
+    def contar_butacas_ocupantes_de_usuario(
+        self, event_id: int, user_id: str, ahora: datetime
+    ) -> int:
+        """
+        Cuenta las butacas ocupantes del usuario para RET-007.
+
+        Una retención ACTIVE vencida no cuenta aunque todavía no haya sido
+        escrita como EXPIRED: marcar_vencidas solo recibe las butacas del lote
+        actual y RET-002 exige considerar también el plazo.
+        """
+        ocupante = or_(
+            HoldModel.status == HoldStatus.CONFIRMED.value,
+            and_(
+                HoldModel.status == HoldStatus.ACTIVE.value,
+                or_(HoldModel.expires_at.is_(None), HoldModel.expires_at > ahora),
+            ),
+        )
+        return self._session.scalar(
+            select(func.count())
+            .select_from(HoldModel)
+            .where(
+                HoldModel.event_id == event_id,
+                HoldModel.user_id == user_id,
+                ocupante,
+            )
+        ) or 0
 
     def obtener_hold(self, hold_id: int) -> Hold | None:
         try:

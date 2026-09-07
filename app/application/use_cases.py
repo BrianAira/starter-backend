@@ -145,8 +145,9 @@ def crear_retenciones(
        misma transacción y antes de insertar.
     3. Evaluar RET-001 por butaca, reutilizando la retención propia si ya
        existe (idempotencia).
-    4. Insertar las que falten.
-    5. Publicar el cambio, ya fuera de la transacción.
+    4. Validar RET-007 sobre las nuevas butacas del lote.
+    5. Insertar las que falten.
+    6. Publicar el cambio, ya fuera de la transacción.
 
     Las butacas se procesan en orden ascendente de identificador: dos
     lotes que se cruzan en distinto orden podrían bloquearse mutuamente.
@@ -191,6 +192,11 @@ def crear_retenciones(
 
         if ocupadas:
             raise ButacasOcupadasError(ocupadas)
+
+        rules.validar_limite_butacas_usuario(
+            repo.contar_butacas_ocupantes_de_usuario(event_id, user_id, momento),
+            len(a_crear),
+        )
 
         for seat_id in a_crear:
             resultado.append(

@@ -37,7 +37,11 @@ from app.api.schemas import (
 )
 from app.application import use_cases
 from app.application.ports import HoldRepository
-from app.core.rules import RetencionDuplicadaError, RetencionNoLiberableError
+from app.core.rules import (
+    LimiteButacasUsuarioError,
+    RetencionDuplicadaError,
+    RetencionNoLiberableError,
+)
 from app.infrastructure import sse
 from app.infrastructure.broker import broker
 from app.infrastructure.db import SessionLocal, get_session
@@ -177,6 +181,12 @@ def crear_retenciones(
             "SEATS_UNAVAILABLE",
             "Una o más butacas ya no están disponibles.",
             seat_ids=exc.seat_ids,
+        )
+    except LimiteButacasUsuarioError:
+        raise error(
+            409,
+            "USER_HOLD_LIMIT_REACHED",
+            "El usuario no puede tener más de 4 butacas ocupadas para un mismo evento.",
         )
     except RetencionDuplicadaError:
         raise error(

@@ -38,6 +38,10 @@ class RetencionNoLiberableError(Exception):
     """Se intentó liberar una retención ya confirmada."""
 
 
+class LimiteButacasUsuarioError(Exception):
+    """RET-007: el usuario excede el cupo de butacas para un evento."""
+
+
 def esta_vencida(hold: Hold, ahora: datetime) -> bool:
     """
     RET-004. Una retención temporal está vencida cuando su plazo pasó.
@@ -144,4 +148,14 @@ def validar_liberacion(hold: Hold) -> None:
     if hold.status is HoldStatus.CONFIRMED:
         raise RetencionNoLiberableError(
             "La retención está confirmada y no puede liberarse."
+        )
+
+
+def validar_limite_butacas_usuario(
+    butacas_ocupantes: int, nuevas_butacas: int
+) -> None:
+    """RET-007: un usuario puede ocupar hasta cuatro butacas por evento."""
+    if butacas_ocupantes + nuevas_butacas > 4:
+        raise LimiteButacasUsuarioError(
+            "El usuario no puede tener más de 4 butacas ocupadas para un mismo evento."
         )

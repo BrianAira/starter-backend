@@ -47,6 +47,12 @@ class HoldRepository(Protocol):
         """Retenciones de un evento, agrupadas por butaca."""
         ...
 
+    def contar_butacas_ocupantes_de_usuario(
+        self, event_id: int, user_id: str, ahora: datetime
+    ) -> int:
+        """Cantidad de butacas ocupantes del usuario para RET-007."""
+        ...
+
     def marcar_vencidas(
         self, event_id: int, seat_ids: list[int], ahora: datetime
     ) -> None:
